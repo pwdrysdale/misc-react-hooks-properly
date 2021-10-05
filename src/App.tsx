@@ -58,23 +58,19 @@ let appRender = 0;
 export default function App() {
     console.log(`appRender = ${appRender++}`);
     const [pokemon, setPokemon] = useState<Pokemon[]>([]);
-    const [search, setSearch] = useState("");
 
-    useEffect(() => {
-        getByName(search).then(setPokemon);
-    }, [search]);
-
-    const pokemonWithPower = useMemo(
-        () =>
-            pokemon.map((p) => ({
-                ...p,
-                power: calculatePower(p),
-            })),
+    const pokemonWithPower: PokemonWithPower[] = useMemo(
+        (): PokemonWithPower[] =>
+            pokemon.map(
+                (p: Pokemon): PokemonWithPower => ({
+                    ...p,
+                    power: calculatePower(p),
+                })
+            ),
         [pokemon]
     );
 
     const [threshold, setThreshold] = useState(0);
-
     const onSetThreshold = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) =>
             setThreshold(parseFloat(e.target.value)),
@@ -82,9 +78,14 @@ export default function App() {
         []
     );
 
+    const [search, setSearch] = useState("");
     const onSetSearch = useCallback((e) => {
         setSearch(e.target.value);
     }, []);
+
+    useEffect(() => {
+        getByName(search).then(setPokemon);
+    }, [search]);
 
     const countOverThreshold = useMemo(
         () => pokemonWithPower.filter((p) => p.power > threshold).length,
